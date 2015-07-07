@@ -1,0 +1,16 @@
+#!/usr/bin/env ruby
+require 'rspec'
+require 'usagi'
+
+Usagi.start
+
+ENV['USAGI_PORT'] = Usagi.port.to_s
+ENV['RAILS_ENV']  = 'test'
+
+
+Usagi.rspec = RSpec::Core::Runner.run((ARGV + Dir['./spec/usagi/**/*.rb']).flatten)
+#system({'USAGI_PORT' => Usagi.port.to_s, 'RAILS_ENV' => 'test'}, 'bundle exec rspec spec/usagi/**/*.rb')
+
+Usagi.stop
+
+Process.exit(Usagi.rspec) if Usagi.rspec != 0
