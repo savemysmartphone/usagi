@@ -24,7 +24,7 @@ RSpec::Matchers.define :usagi_scenario do |*api_declaration|
     full_uri = URI::HTTP.build([
       nil,
       "localhost",
-      ENV['USAGI_PORT'].to_i,
+      Usagi.port,
       path,
       query,
       nil
