@@ -5,7 +5,7 @@ module Usagi
     end
 
     def ==(other_data)
-      return true if @data == 'ANY_VALUE'
+      return true if @data == Usagi::ApiResponse::any_value
       raise "non-matching data: #{@data}__#{other_data}__" unless @data.class == other_data.class
       case @data.class.to_s
       when 'Array'
@@ -14,13 +14,26 @@ module Usagi
           Usagi::ApiResponse.new(value) == other_data[i]
         end
       when 'Hash'
-        raise "non-matching hash name: #{@data}__#{other_data}__" unless @data.keys.length == other_data.keys.length
+        raise "non-matching hash keys: #{@data.keys}__#{other_data.keys}__" unless @data.keys.length == other_data.keys.length
         @data.all? do |key, value|
-          next true if %i(created_at updated_at deleted_at).include?(key)
+          next true if Usagi::ApiResponse.unmatchable_keys.include?(key)
           Usagi::ApiResponse.new(value) == other_data[key]
         end
       else
         @data == other_data
+      end
+    end
+
+    class << self
+      attr_accessor :any_value
+      attr_accessor :unmatchable_keys
+
+      def any_value
+        @any_value || 'ANY_VALUE'
+      end
+
+      def unmatchable_keys
+        @unmatchable_keys || %i(created_at updated_at deleted_at)
       end
     end
   end

@@ -2,7 +2,7 @@ require 'logger'
 
 module Usagi
   class << self
-    attr_accessor :pid, :port, :rspec
+    attr_accessor :pid, :port, :rspec, :suite_options
 
     def start
       @port = (rand * 65535).to_i until defined?(@port) && @port > 1024
@@ -29,6 +29,10 @@ module Usagi
       rescue
       end
       puts "[usagi][#{@pid}] Killed rails server"
+    end
+
+    def suite_options
+      @suite_options || {}
     end
   end
 end
