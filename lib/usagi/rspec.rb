@@ -19,6 +19,8 @@ RSpec::Matchers.define :usagi_scenario do |*api_declaration|
     path  = URI.parse(path).path
     query = Rack::Utils.parse_nested_query(query).merge(api_opts[:query] || {}).to_query
     post_data = api_opts[:body]
+    headers   = api_opts[:headers]
+
     full_uri = URI::HTTP.build([
       nil,
       "localhost",
@@ -28,7 +30,10 @@ RSpec::Matchers.define :usagi_scenario do |*api_declaration|
       nil
     ]).to_s
     data = %[curl --silent -X #{protocol} "#{full_uri}"]
-    data += %[--data "#{post_data.to_query}"] if post_data && post_data.keys.length > 0
+    data += %[ --data "#{post_data.to_query}"] if post_data && post_data.keys.length > 0
+    headers.each do |key, value|
+      data += %[ -H "#{key}: #{value}"]
+    end if headers
     data = `#{data}`
     data = JSON.parse(data)
     Usagi::ApiResponse.new(scenario['reply']) == data
