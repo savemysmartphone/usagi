@@ -4,11 +4,15 @@ require 'usagi'
 
 Usagi.start
 
-ENV['USAGI_PORT'] = Usagi.port.to_s
 ENV['RAILS_ENV']  = 'test'
 
-Usagi.rspec = RSpec::Core::Runner.run((ARGV + Dir['./spec/usagi/**/*.rb']).flatten)
+begin
+  Usagi.rspec = RSpec::Core::Runner.run((ARGV + Dir['./spec/usagi/**/*.rb']).flatten)
+rescue
+  puts "[usagi][#{Usagi.pid}] RSpec encountered an exception"
+  Usagi.stop
+  raise
+end
 
 Usagi.stop
-
 Process.exit(Usagi.rspec) if Usagi.rspec != 0
