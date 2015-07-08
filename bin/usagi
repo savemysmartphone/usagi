@@ -7,7 +7,9 @@ Usagi.start
 ENV['RAILS_ENV']  = 'test'
 
 begin
-  Usagi.rspec = RSpec::Core::Runner.run((ARGV + Dir['./spec/usagi/**/*.rb']).flatten)
+  argv_list = ARGV
+  argv_list += Dir['./spec/usagi/**/*.rb'] unless ARGV.any?{|argv| argv =~ /\.rb$/ }
+  Usagi.rspec = RSpec::Core::Runner.run(argv_list.flatten)
 rescue
   puts "[usagi][#{Usagi.pid}] RSpec encountered an exception"
   Usagi.stop
