@@ -20,18 +20,19 @@ module Usagi
       case @data.class.to_s
       when 'Array'
         raise "non-matching array length (#{@data.length} != #{other_data.length}): #{@data}__#{other_data}__" unless @data.length == other_data.length
-        @data.each_with_index.all? do |value, i|
+        raise "non-matching arrays: #{@data}__#{other_data}__" unless @data.each_with_index.all? do |value, i|
           Usagi::ApiResponse.new(value) == other_data[i]
         end
       when 'Hash'
         raise "non-matching hash keys: #{@data.keys}__#{other_data.keys}__" unless @data.keys.length == other_data.keys.length
-        @data.all? do |key, value|
+        raise "non-matching hashes: #{@data}__#{other_data}__" unless @data.all? do |key, value|
           next true if Usagi::ApiResponse.unmatchable_keys.include?(key)
           Usagi::ApiResponse.new(value) == other_data[key]
         end
       else
-        @data == other_data
+        raise "non-matching data: #{@data}__#{other_data}" unless @data == other_data
       end
+      true
     end
 
     class << self
