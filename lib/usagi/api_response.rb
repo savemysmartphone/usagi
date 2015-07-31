@@ -50,7 +50,7 @@ module Usagi
 
       def reuse_value(name)
         @stored_values ||= {}
-        unless @stored_values.keys.include?(name)
+        unless @stored_values.keys.include?(name) || Usagi.options[:allow_nil_store_values]
           raise ArgumentError, "stored value name #{name} was never used"
         end
         value = @stored_values[name]
@@ -60,7 +60,7 @@ module Usagi
 
       def store_value(name, value)
         @stored_values ||= {}
-        if @stored_values.keys.include?(name)
+        if @stored_values.keys.include?(name) && !Usagi.options[:allow_store_key_reuse]
           raise ArgumentError, "stored value name #{name} already used"
         end
         @stored_values[name] = value

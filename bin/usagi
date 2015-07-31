@@ -2,12 +2,19 @@
 require 'rspec'
 require 'usagi'
 
-Usagi.start
+# Available options:
+# > --usagi-debug-requests:         Outputs all curl commands used and the results
+# > --usagi-rails-output:           Outputs all rails IO
+# > --usagi-allow-store-key-reuse:  Allows to use STORE_VALUE multiple times with same key name
+# > --usagi-allow_nil_store_values: Allows to store nil value for later use with REUSE_VALUE
+
+usagi_args = ARGV.grep(/--usagi-/)
+Usagi.start(*usagi_args)
 
 ENV['RAILS_ENV']  = 'test'
 
 begin
-  argv_list = ARGV
+  argv_list = ARGV - usagi_args
   argv_list += Dir['./spec/usagi/**/*.rb'] unless ARGV.any?{|argv| argv =~ /\.rb$/ }
   Usagi.rspec = RSpec::Core::Runner.run(argv_list.flatten)
 rescue

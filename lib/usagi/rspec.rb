@@ -34,7 +34,9 @@ RSpec::Matchers.define :usagi_scenario do |*api_declaration|
     headers.each do |key, value|
       data += %[ -H "#{key}: #{value}"]
     end if headers
+    puts "REQ__#{data}__" if Usagi.options[:debug_requests]
     data = `#{data}`
+    puts "RES__#{data}__" if Usagi.options[:debug_requests]
     data = JSON.parse(data)
     Usagi::ApiResponse.new(scenario['reply']) == data
   end
