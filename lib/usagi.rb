@@ -6,7 +6,20 @@ module Usagi
 
     def start
       @port = (rand * 65535).to_i until defined?(@port) && @port > 1024
-      @pid = IO.popen([{'RAILS_ENV' => 'test'},['rails', 'bundle'], 'server', '-p', @port.to_s]).pid
+      @io = IO.popen([{'RAILS_ENV' => 'test'},['rails', 'bundle'], 'server', '-p', @port.to_s])
+      Thread.new(@io) do |rails_io|
+        buffer = ''
+        until rails_io.eof?
+          buffer += rails_io.readpartial(1024)
+          while buffer["\n"]
+            minibuf = buffer.split("\n").first
+            buffer = buffer[(minibuf.length + 1)..-1]
+            puts "[rails]>> #{minibuf}"
+          end
+        end
+        puts "[rails]>> #{buffer}" if buffer.length > 0
+      end
+      @pid = @io.pid
       puts "[usagi][#{@pid}] Running rails server on port #{@port}"
 
       Signal.trap('INT') do
