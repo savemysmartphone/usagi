@@ -5,6 +5,8 @@ module Usagi
     end
 
     def ==(other_data)
+      puts "EXPECTED: #{@data}"
+      puts "GOT: #{other_data}"
       if @data =~ /^STORE_VALUE\((:.*)\)$/
         return Usagi::ApiResponse.store_value($1, other_data)
       end
@@ -16,6 +18,7 @@ module Usagi
         return true
       end
       return true if @data == Usagi::ApiResponse::any_value
+      return true if @data == Usagi::ApiResponse::any_value_not_nil && @data != nil
       raise "non-matching data: #{@data}__#{other_data}__" unless @data.class == other_data.class
       case @data.class.to_s
       when 'Array'
@@ -37,11 +40,16 @@ module Usagi
 
     class << self
       attr_accessor :any_value
+      attr_accessor :any_value_not_nil
       attr_accessor :unmatchable_keys
       attr_accessor :stored_values
 
       def any_value
         @any_value || 'ANY_VALUE'
+      end
+
+      def any_value_not_nil
+        @any_value_not_nil || 'ANY_VALUE_NOT_NIL'
       end
 
       def unmatchable_keys
