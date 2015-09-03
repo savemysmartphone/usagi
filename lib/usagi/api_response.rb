@@ -25,33 +25,34 @@ module Usagi
         matcher, args = *matcher_and_args
         return true if matcher.matches?(other_data, args)
       else
-        raise "non-matching data: #{@data}__#{other_data}__" unless @data.class == other_data.class
+        raise "non-matching data: (expected: #{@data}, got: #{other_data})" unless @data.class == other_data.class
         case @data.class.to_s
         when 'Array'
-          raise "non-matching array length (#{@data.length} != #{other_data.length}): #{@data}__#{other_data}__" unless @data.length == other_data.length
-          raise "non-matching arrays: #{@data}__#{other_data}__" unless @data.each_with_index.all? do |value, i|
+          raise "non-matching array length (expected: #{@data.length}, got #{other_data.length})" unless @data.length == other_data.length
+          raise "non-matching arrays (expected: #{@data}, got: #{other_data})" unless @data.each_with_index.all? do |value, i|
             Usagi::ApiResponse.new(value) == other_data[i]
           end
         when 'Hash'
-          raise "non-matching hash keys: #{@data.keys}__#{other_data.keys}__" unless @data.keys.length == other_data.keys.length
-          raise "non-matching hashes: #{@data}__#{other_data}__" unless @data.all? do |key, value|
+          exp_keys = @data.keys.map(&:to_sym) - Usagi::ApiResponse.unmatchable_keys
+          got_keys = other_data.keys.map(&:to_sym) - Usagi::ApiResponse.unmatchable_keys
+          raise "non-matching hash keys (expected: #{exp_keys}, got: #{got_keys}" unless exp_keys.length == got_keys.length
+          raise "non-matching hashes (expected #{@data}, got: #{other_data})" unless @data.all? do |key, value|
             next true if Usagi::ApiResponse.unmatchable_keys.include?(key)
             Usagi::ApiResponse.new(value) == other_data[key]
           end
         else
-          raise "non-matching data: #{@data}__#{other_data}" unless @data == other_data
+          raise "non-matching data (expected: #{@data}, got: #{other_data})" unless @data == other_data
         end
       end
       true
     end
 
     class << self
-      attr_accessor :any_value
       attr_accessor :unmatchable_keys
       attr_accessor :stored_values
 
       def unmatchable_keys
-        @unmatchable_keys || %i(created_at updated_at deleted_at)
+        Usagi.suite_options[:unmatchable_keys] ||%i(created_at updated_at)
       end
 
       def reuse_value(name)

@@ -2,7 +2,7 @@
 require 'rspec'
 require 'usagi'
 
-# Available options:
+# Available startup arguments:
 # > --usagi-debug-requests:         Outputs all curl commands used and the results
 # > --usagi-rails-output:           Outputs all rails IO
 # > --usagi-allow-store-key-reuse:  Allows to use STORE_VALUE multiple times with same key name

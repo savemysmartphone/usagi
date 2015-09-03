@@ -20,7 +20,7 @@ class Matcher
     end
 
     def error_block
-      @error || lambda{|api_value| "non-matching value: #{api_value}" }
+      @error || lambda{|api_value| "non-matching value (got: #{api_value})" }
     end
 
     def error_message

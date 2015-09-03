@@ -8,7 +8,7 @@ end
 
 Usagi.define_matcher :any_value_not_nil do
   error do
-    "should return a non-nil value"
+    "expected to be a non-nil value"
   end
 
   match do |api_value|
@@ -18,7 +18,7 @@ end
 
 Usagi.define_matcher :range do |from, to|
   error do |api_value|
-    "should be in range #{from}..#{to} (got: #{api_value})"
+    "expected to be in range #{from}..#{to} (got: #{api_value})"
   end
 
   match do |api_value|

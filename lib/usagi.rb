@@ -46,8 +46,12 @@ module Usagi
       puts "[usagi][#{@pid}] Killed rails server"
     end
 
+    def options
+      @options ||= {}
+    end
+
     def suite_options
-      @suite_options || {}
+      @suite_options ||= {}
     end
 
     # Matchers methods
