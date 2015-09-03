@@ -46,8 +46,38 @@ module Usagi
       puts "[usagi][#{@pid}] Killed rails server"
     end
 
+    def options
+      @options ||= {}
+    end
+
     def suite_options
-      @suite_options || {}
+      @suite_options ||= {}
+    end
+
+    # Matchers methods
+    def define_matcher(name, &block)
+      if matchers[name.to_s.upcase]
+        raise ArgumentError("already defined matcher #{name.to_s.upcase}")
+      end
+      matchers[name.to_s.upcase] = Matcher.new(name.to_s.upcase, &block)
+    end
+
+    def remove_matcher(name)
+      unless matchers[name.to_s.upcase]
+        raise ArgumentError("undefined matcher #{name.to_s.upcase}")
+      end
+      matchers.delete(name.to_s.upcase)
+    end
+
+    def rename_matcher(old_name, new_name)
+      unless matchers[old_name.to_s.upcase]
+        raise ArgumentError("undefined matcher #{old_name.to_s.upcase}")
+      end
+      matchers[new_name.to_s.upcase] = matchers.delete(old_name.to_s.upcase)
+    end
+
+    def matchers
+      @matchers ||= MatcherContainer.new
     end
   end
 end
