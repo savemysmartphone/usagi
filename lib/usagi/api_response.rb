@@ -7,6 +7,10 @@ module Usagi
       @data = data
     end
 
+    def missing_keys(array1, array2)
+      (array2 - array1) + (array1 - array2)
+    end
+
     def ==(other_data)
       ## matchers
       if @data =~ /^STORE_VALUE\((:.*)\)$/
@@ -35,7 +39,8 @@ module Usagi
         when 'Hash'
           exp_keys = @data.keys.map(&:to_sym) - Usagi::ApiResponse.unmatchable_keys
           got_keys = other_data.keys.map(&:to_sym) - Usagi::ApiResponse.unmatchable_keys
-          raise "non-matching hash keys (expected: #{exp_keys}, got: #{got_keys}" unless exp_keys.length == got_keys.length
+
+          raise "non-matching hash keys (expected: #{exp_keys}, got: #{got_keys}, missing key(s): #{missing_keys(exp_keys, got_keys)}" unless exp_keys.length == got_keys.length
           raise "non-matching hashes (expected #{@data}, got: #{other_data})" unless @data.all? do |key, value|
             next true if Usagi::ApiResponse.unmatchable_keys.include?(key)
             Usagi::ApiResponse.new(value) == other_data[key]
