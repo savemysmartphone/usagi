@@ -25,3 +25,14 @@ Usagi.define_matcher :range do |from, to|
     api_value >= from && api_value <= to
   end
 end
+
+Usagi.define_matcher :obj_has_many do |object_counts, object_keys|
+  error do |api_value|
+    "expected to have #{object_counts} objects, with the following keys: #{object_keys}"
+  end
+
+  match do |api_value|
+    next nil unless api_value.length == object_counts
+    api_value.all?{|row| row.keys.map!(&:to_sym) == object_keys }
+  end
+end
