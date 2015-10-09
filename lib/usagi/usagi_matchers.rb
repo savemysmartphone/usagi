@@ -28,11 +28,11 @@ end
 
 Usagi.define_matcher :obj_has_many do |object_counts, object_keys|
   error do |api_value|
-    "expected to have #{object_counts} objects, with the following keys: #{object_keys}"
+    "expected to have #{object_counts} objects, with the following keys: #{object_keys.sort} (got #{api_value.length} objects with keys: #{api_value.map(&:keys).flatten.uniq.map(&:to_sym).sort}"
   end
 
   match do |api_value|
     next nil unless api_value.length == object_counts
-    api_value.all?{|row| row.keys.map!(&:to_sym) == object_keys }
+    api_value.all?{|row| row.keys.map(&:to_sym).sort == object_keys.sort }
   end
 end
