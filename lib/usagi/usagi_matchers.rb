@@ -36,3 +36,15 @@ Usagi.define_matcher :obj_has_many do |object_counts, object_keys|
     api_value.all?{|row| row.keys.map(&:to_sym).sort == object_keys.sort }
   end
 end
+
+Usagi.define_matcher :any_value_matches do |regexp|
+  error do |api_value|
+    "expected api_value to match #{regexp}"
+  end
+
+  match do |api_value|
+    next true if api_value.is_a?(NilClass)
+    next nil if regexp.match(api_value).nil?
+    true
+  end
+end
