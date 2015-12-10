@@ -8,6 +8,28 @@ require 'usagi'
 # > --usagi-allow-store-key-reuse:  Allows to use STORE_VALUE multiple times with same key name
 # > --usagi-allow_nil_store_values: Allows to store nil value for later use with REUSE_VALUE
 
+if ARGV.grep(/^-(h|-help)$/).length > 0
+  puts <<-EOHELP
+    Usagi is a functional test suite for rails APIs based on RSpec.
+
+    All arguments not starting with `--usagi` will be passed to RSpec.
+
+    Arguments:
+      --help, -h
+        Displays this help message
+      --usagi-debug-requests
+        Outputs all curl payloads as REQ and the results data as RES.
+      --usagi-rails-output
+        Shows buffered rails for all requests.
+      --usagi-allow-store-key-reuse
+        Allows to use the STORE_VALUE directive multiple times with the
+        same key name.
+      --usagi-allow-nil-store-values
+        Allows to store nil values for later use with REUSE_VALUE.
+  EOHELP
+  Process.exit(0)
+end
+
 usagi_args = ARGV.grep(/--usagi-/)
 Usagi.start(*usagi_args)
 

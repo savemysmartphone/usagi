@@ -16,11 +16,11 @@ module Usagi
           while buffer["\n"]
             minibuf = buffer.split("\n").first
             buffer = buffer[(minibuf.length + 1)..-1]
-            puts "[rails]>> #{minibuf}" if Usagi.options[:rails_output]
+            puts "[rails]>> #{minibuf}"
           end
         end
-        puts "[rails]>> #{buffer}" if buffer.length > 0 && Usagi.options[:rails_output]
-      end
+        puts "[rails]>> #{buffer}" if buffer.length > 0
+      end if Usagi.options[:rails_output]
       @pid = @io.pid
       puts "[usagi][#{@pid}] Running rails server on port #{@port}"
 
