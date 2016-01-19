@@ -31,7 +31,10 @@ if ARGV.grep(/^-(h|-help)$/).length > 0
 end
 
 usagi_args = ARGV.grep(/--usagi-/)
-Usagi.start(*usagi_args)
+
+Dir.chdir(ENV['USAGI_APP_ROOT'] || "./") do
+  Usagi.start(*usagi_args)
+end
 
 ENV['RAILS_ENV']  = 'test'
 
