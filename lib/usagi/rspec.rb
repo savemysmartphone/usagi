@@ -19,7 +19,8 @@ RSpec::Matchers.define :usagi_scenario do |*api_declaration|
     path  = URI.parse(path).path
     query = Rack::Utils.parse_nested_query(query).merge(api_opts[:query] || {}).to_query
     post_data = api_opts[:body]
-    headers   = api_opts[:headers]
+    headers   = api_opts[:headers] || {}
+    headers['Cookie'] = Usagi.cookies if Usagi.suite_options[:cookies]
 
     full_uri = URI::HTTP.build([
       nil,
@@ -29,15 +30,19 @@ RSpec::Matchers.define :usagi_scenario do |*api_declaration|
       query,
       nil
     ]).to_s
-    data = %[curl --silent -X #{protocol} "#{full_uri}"]
+    data = %[curl -i --silent -X #{protocol} "#{full_uri}"]
     data += %[ --data "#{post_data.to_query}"] if post_data && post_data.keys.length > 0
     headers.each do |key, value|
       data += %[ -H "#{key}: #{value}"]
     end if headers
     puts "REQ__#{data}__" if Usagi.options[:debug_requests]
     data = `#{data}`
-    puts "RES__#{data}__" if Usagi.options[:debug_requests]
-    data = JSON.parse(data)
-    Usagi::ApiResponse.new(scenario['reply']) == data
+    head, body = data.split("\r\n\r\n", 2)
+    head.each_line do |li|
+      Usagi.cookies = li.split(' ', 2).last if li =~ /^Set-Cookie:/
+    end if Usagi.suite_options[:cookies]
+    puts "RES__#{body}__" if Usagi.options[:debug_requests]
+    body = JSON.parse(body)
+    Usagi::ApiResponse.new(scenario['reply']) == body
   end
 end

@@ -2,7 +2,7 @@ require 'logger'
 
 module Usagi
   class << self
-    attr_accessor :pid, :port, :rspec, :suite_options, :options
+    attr_accessor :pid, :port, :rspec, :suite_options, :options, :cookies
 
     def start(*opts)
       @options = {}
@@ -52,6 +52,15 @@ module Usagi
 
     def suite_options
       @suite_options ||= {}
+    end
+
+    def use_session(b)
+      suite_options[:cookies] = b
+      clean_cookies unless b
+    end
+
+    def clean_cookies
+      @cookies = ''
     end
 
     # Matchers methods
