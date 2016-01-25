@@ -1,12 +1,12 @@
 require 'logger'
 
 module Usagi
+  VERSION = '1.0.0'
+
   class << self
     attr_accessor :pid, :port, :rspec, :suite_options, :options
 
-    def start(*opts)
-      @options = {}
-      opts.each{|opt| @options[opt.gsub(/^--usagi-/,'').gsub('-','_').to_sym] = true }
+    def start
       @port = (rand * 65535).to_i until defined?(@port) && @port > 1024
       @io = IO.popen([{'RAILS_ENV' => 'test'},['rails', 'bundle'], 'server', '-p', @port.to_s])
       Thread.new(@io) do |rails_io|
