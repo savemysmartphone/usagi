@@ -26,20 +26,21 @@ if ARGV.grep(/^-(h|-help)$/).length > 0
         same key name.
       --usagi-allow-nil-store-values
         Allows to store nil values for later use with REUSE_VALUE.
+      --chdir
+        Allows to choose the execution directory of the command
   EOHELP
   Process.exit(0)
 end
 
 usagi_args = ARGV.grep(/--usagi-/)
 
-Dir.chdir(ENV['USAGI_APP_ROOT'] || "./") do
-  Usagi.start(*usagi_args)
-end
+directory = ARGV.grep(/--chdir/) == ['--chdir'] ? [ARGV.select{|arg| arg =~ /^(.+)\/([^\/]+)$/}.first] : ['./']
+Dir.chdir(directory.first) { Usagi.start(*usagi_args) }
 
 ENV['RAILS_ENV']  = 'test'
 
 begin
-  argv_list = ARGV - usagi_args
+  argv_list = ARGV - (usagi_args + ARGV.grep(/--chdir/))
   argv_list += Dir['./spec/usagi/**/*.rb'] unless ARGV.any?{|argv| argv =~ /\.rb$/ }
   Usagi.rspec = RSpec::Core::Runner.run(argv_list.flatten)
 rescue
