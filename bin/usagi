@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 require 'rspec'
 require 'usagi'
+require 'slop'
 
 # Available startup arguments:
 # > --usagi-debug-requests:         Outputs all curl commands used and the results
@@ -8,14 +9,59 @@ require 'usagi'
 # > --usagi-allow-store-key-reuse:  Allows to use STORE_VALUE multiple times with same key name
 # > --usagi-allow_nil_store_values: Allows to store nil value for later use with REUSE_VALUE
 
-usagi_args = ARGV.grep(/--usagi-/)
-Usagi.start(*usagi_args)
+# Path option for Slop parser
+module Slop
+  class PathOption < Option
+    def call(value)
+      Pathname.new(value)
+    end
+  end
+end
+
+#  Options parser, don't raise error when unknown options (stored in opts.arguments)
+opts = Slop.parse suppress_errors: true do |o|
+  o.banner = 'Usage: usagi [options] [files or directories]'
+  o.separator '    Usagi is a functional test suite for rails APIs based on RSpec.'
+  o.separator ''
+  o.on '-h','--help', 'displays this help message' do
+    puts <<-EOHELP
+    All arguments not starting with `--usagi` will be passed to RSpec.
+    #{o}
+
+    --usagi-debug-requests
+      Outputs all curl payloads as REQ and the results data as RES.
+    --usagi-rails-output
+      Shows buffered rails for all requests.
+    --usagi-allow-store-key-reuse
+      Allows to use the STORE_VALUE directive multiple times with the
+      same key name.
+    --usagi-allow-nil-store-values
+      Allows to store nil values for later use with REUSE_VALUE.
+    --usagi-app-dir
+      Allows to choose the execution directory of the command
+    EOHELP
+    exit
+  end
+  o.on '-v', '--version', 'print the version' do
+    puts Usagi::VERSION
+    exit
+  end
+  o.path '--usagi-app-dir', default: './', help: false
+  %w(debug-requests rails-output allow-store-key-reuse).each do |usagi_o|
+    o.null "--usagi-#{usagi_o}", help: false do
+      Usagi.options[usagi_o.gsub('-', '_').to_sym] = true
+    end
+  end
+end
+
+# In case you pass the execution directory option
+Dir.chdir(opts.to_hash.send(:[], :usagi_app_dir)) { Usagi.start }
 
 ENV['RAILS_ENV']  = 'test'
 
 begin
-  argv_list = ARGV - usagi_args
-  argv_list += Dir['./spec/usagi/**/*.rb'] unless ARGV.any?{|argv| argv =~ /\.rb$/ }
+  argv_list = opts.arguments # Method provided by slop gem to retrieve unknown options
+  argv_list += Dir['./spec/usagi/**/*.rb'] unless opts.arguments.any?{|argv| argv =~ /\.rb$/ }
   Usagi.rspec = RSpec::Core::Runner.run(argv_list.flatten)
 rescue
   puts "[usagi][#{Usagi.pid}] RSpec encountered an exception"

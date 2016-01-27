@@ -1,12 +1,12 @@
 require 'logger'
 
 module Usagi
+  VERSION = '1.0.0'
+
   class << self
     attr_accessor :pid, :port, :rspec, :suite_options, :options
 
-    def start(*opts)
-      @options = {}
-      opts.each{|opt| @options[opt.gsub(/^--usagi-/,'').gsub('-','_').to_sym] = true }
+    def start
       @port = (rand * 65535).to_i until defined?(@port) && @port > 1024
       @io = IO.popen([{'RAILS_ENV' => 'test'},['rails', 'bundle'], 'server', '-p', @port.to_s])
       Thread.new(@io) do |rails_io|
@@ -16,11 +16,11 @@ module Usagi
           while buffer["\n"]
             minibuf = buffer.split("\n").first
             buffer = buffer[(minibuf.length + 1)..-1]
-            puts "[rails]>> #{minibuf}" if Usagi.options[:rails_output]
+            puts "[rails]>> #{minibuf}"
           end
         end
-        puts "[rails]>> #{buffer}" if buffer.length > 0 && Usagi.options[:rails_output]
-      end
+        puts "[rails]>> #{buffer}" if buffer.length > 0
+      end if Usagi.options[:rails_output]
       @pid = @io.pid
       puts "[usagi][#{@pid}] Running rails server on port #{@port}"
 
