@@ -12,6 +12,4 @@ Gem::Specification.new do |s|
   s.executables  << 'usagi'
   s.require_path = 'lib'
   s.required_ruby_version = '>= 2.0.0'
-
-  s.add_dependency 'slop'
 end
