@@ -4,7 +4,7 @@ module Usagi
   VERSION = '1.0.0'
 
   class << self
-    attr_accessor :pid, :port, :rspec, :suite_options, :options
+    attr_accessor :pid, :port, :rspec, :suite_options, :options, :cookies
 
     def start
       @port = (rand * 65535).to_i until defined?(@port) && @port > 1024
@@ -52,6 +52,15 @@ module Usagi
 
     def suite_options
       @suite_options ||= {}
+    end
+
+    def use_session(b)
+      suite_options[:cookies] = b
+      clean_cookies unless b
+    end
+
+    def clean_cookies
+      @cookies = ''
     end
 
     # Matchers methods
