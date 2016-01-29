@@ -257,8 +257,8 @@ end
 ### Adding suite options
 Default unmatchable keys are `:created_at` and `:updated_at`, you can rewrite this option this way:
 
-
-  Usagi.suite_options = {
-    unmatchable_keys: [:id, :updated_at, :created_at]
-  }
-
+```
+Usagi.suite_options = {
+  unmatchable_keys: [:id, :updated_at, :created_at]
+}
+```
