@@ -102,7 +102,7 @@ describe 'FEATURE: sort_by' do
   it { should usagi_scenario('sort posts by title DESC') }
   end
 end
-``
+```
 
 The above example uses only standard Rails and RSpec APIs, but many RSpec/Rails users like to use extension libraries like [FactoryGirl](https://github.com/thoughtbot/factory_girl) and [DatabaseCleaner](https://github.com/DatabaseCleaner/database_cleaner).
 
