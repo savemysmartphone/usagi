@@ -189,7 +189,7 @@ Posts (CREATE):
       created_at: ANY_VALUE # other usagi matcher
     }
   }
-``
+```
 
 ### Usagi Matchers
 The default matchers are the following ones:
