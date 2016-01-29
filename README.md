@@ -98,8 +98,8 @@ describe 'FEATURE: sort_by' do
     end
 
   context 'Default sort for Posts' do
-  it { should usagi_scenario('sort posts by title ASC') }
-  it { should usagi_scenario('sort posts by title DESC') }
+    it { should usagi_scenario('sort posts by title ASC') }
+    it { should usagi_scenario('sort posts by title DESC') }
   end
 end
 ```
@@ -107,7 +107,7 @@ end
 The above example uses only standard Rails and RSpec APIs, but many RSpec/Rails users like to use extension libraries like [FactoryGirl](https://github.com/thoughtbot/factory_girl) and [DatabaseCleaner](https://github.com/DatabaseCleaner/database_cleaner).
 
 ### Scenario
-The scenario Yaml file is **the expected output of your API requests** named after the execution file. It lists all the **contexts** and **usagi scenario** described in the `.rb` corresponding file.
+The scenario YAML file is **the expected output of your API requests**, named after the execution file. It lists all the **contexts** and **usagi scenario** described in the `.rb` corresponding file.
 
 It requires the following fields:
 
@@ -183,7 +183,7 @@ Posts (CREATE):
   query: POST /v1/posts
   reply: {
     post: {
-      id: ANY_VALUE_NOT_NIL # one of the default value matcher provided by the gem
+      id: ANY_VALUE_NOT_NIL, # one of the default value matcher provided by the gem
       title: 'New post',
       author: 'me@me.com',
       created_at: ANY_VALUE # other usagi matcher
@@ -248,7 +248,7 @@ Usagi.define_matcher :name_of_your_matcher do |matcher_args|
   end
 
   match do |api_value|
-    # your matching code here
+    # your matching code here returning true or false
   end
 end
 
